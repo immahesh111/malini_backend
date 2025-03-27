@@ -68,7 +68,7 @@ app.listen(PORT, () => {
 app.get("/api/chatgpt", async (req, res) => {
   try {
     // Logic for handling GET requests to /api/ghjg
-    res.json({ message: "Hello from /api/ghjg" });
+    res.json({ message: "Hello from /api/chatgpt" });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "An error occurred" });
