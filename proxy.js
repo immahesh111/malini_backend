@@ -64,3 +64,14 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.get("/api/chatgpt", async (req, res) => {
+  try {
+    // Logic for handling GET requests to /api/ghjg
+    res.json({ message: "Hello from /api/ghjg" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
