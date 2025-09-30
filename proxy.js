@@ -17,6 +17,11 @@ app.post("/api/chatgpt", async (req, res) => {
   try {
     const userMessage = req.body.message;
 
+    // Add input validation
+    if (!userMessage || typeof userMessage !== "string") {
+      return res.status(400).json({ error: "Invalid input message" });
+    }
+
     // Construct the prompt with the knowledge base and user query
     const prompt = `Based on the following information, provide a concise, technical answer to the question: "${userMessage}". If the question involves solutions, prioritize simple solutions over complex ones. Keep it conversational and do not use asterisks, bolding, or any markdown formatting. Please provide plain text only.
 
@@ -43,6 +48,7 @@ ${knowledgeBase}`;
           Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           "Content-Type": "application/json",
         },
+        timeout: 30000, // 30 second timeout
       }
     );
 
@@ -53,10 +59,18 @@ ${knowledgeBase}`;
     // Remove any other markdown-like characters that might cause issues
     generatedText = generatedText.replace(/[_`]/g, ""); // Remove underscores and backticks
 
+    // Add error handling for empty responses
+    if (!response.data?.choices?.[0]?.message?.content) {
+      return res.status(500).json({ error: "Invalid API response format" });
+    }
+
     res.json({ response: generatedText });
   } catch (error) {
-    console.error("Error:", error.response ? error.response.data : error.message);
-    res.status(error.response ? error.response.status : 500).json({ error: "An error occurred" });
+    // Improved error logging and response
+    console.error("API Error:", error.message);
+    const statusCode = error.response?.status || 500;
+    const errorMessage = error.response?.data?.error || "An internal server error occurred";
+    res.status(statusCode).json({ error: errorMessage });
   }
 });
 
